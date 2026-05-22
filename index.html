@@ -22,6 +22,8 @@
             50% { opacity: 0.45; }
         }
         .glow-effect { animation: pulseGlow 3s ease-in-out infinite; }
+        
+        /* Custom progress bar transitions */
         .progress-transition { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; }
     </style>
 </head>
@@ -142,57 +144,270 @@
     <div id="dashboard-view" class="hidden min-h-screen flex flex-col">
         <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-xl sticky top-0 z-50 transition-all duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3 group">
-                    <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-600/20">
+                <div class="flex items-center gap-3 group cursor-pointer" onclick="navigateToLanding()">
+                    <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-600/20 group-hover:scale-105 transition-transform duration-300">
                         <i data-lucide="credit-card" class="w-5 h-5"></i>
                     </div>
-                    <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">SubSpace<span class="text-xs ml-1 px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700 font-sans tracking-normal">PRO</span></span>
+                    <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">SubSpace<span class="text-xs ml-1 px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">PRO</span></span>
                 </div>
                 
                 <div class="flex items-center gap-3 flex-wrap justify-center">
                     <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300">
                         <i data-lucide="user-check" class="w-3.5 h-3.5 mr-2 text-indigo-400"></i>
-                        <span id="user-display-tag" class="font-bold">Active User</span>
+                        <span id="user-display-tag" class="font-bold truncate max-w-[140px]">Active Session</span>
                     </div>
-                    <div class="flex gap-1.5">
-                        <button onclick="logoutSession()" class="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-900/30 text-slate-400 hover:text-rose-400 rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md">
+
+                    <div class="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-inner hover:border-slate-700 transition-colors">
+                        <i data-lucide="globe" class="w-4 h-4 text-slate-400 mr-2"></i>
+                        <select id="global-currency" onchange="changeCurrency(this.value)" class="bg-transparent text-sm text-slate-200 focus:outline-none pr-1 cursor-pointer font-semibold">
+                            <option value="$" class="bg-slate-900">$ USD</option>
+                            <option value="€" class="bg-slate-900">€ EUR</option>
+                            <option value="£" class="bg-slate-900">£ GBP</option>
+                            <option value="¥" class="bg-slate-900">¥ JPY</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="exportData()" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md" title="Export JSON Backup">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
+                        </button>
+                        <label class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md cursor-pointer" title="Import JSON Backup">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import
+                            <input type="file" id="import-file" onchange="importData(event)" class="hidden" accept=".json">
+                        </label>
+                        <button onclick="logoutSession()" class="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-900/30 text-slate-400 hover:text-rose-400 rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md" title="Log Out Session">
                             <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </header>
+
         <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10 w-full flex-1">
-            <div class="border border-slate-800 bg-slate-900/20 backdrop-blur-md rounded-2xl p-8 text-center text-slate-400 max-w-md mx-auto mt-20 animate-render">
-                <i data-lucide="check-circle" class="w-12 h-12 text-indigo-400 mx-auto mb-4"></i>
-                <h2 class="text-xl font-bold text-slate-200 mb-2">Workspace Ready</h2>
-                <p class="text-sm">Welcome to SubSpace Pro. Authentication verification was handled successfully.</p>
+            
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl group hover:border-rose-500/30 transition-all duration-300 backdrop-blur-sm">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Monthly Burn Rate</p>
+                        <h3 id="monthly-total" class="text-2xl font-extrabold mt-1 text-slate-100 transition-all duration-300 group-hover:text-rose-400">$0.00</h3>
+                    </div>
+                    <div class="bg-rose-500/10 p-3 rounded-xl text-rose-400 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="trending-up" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl group hover:border-amber-500/30 transition-all duration-300 backdrop-blur-sm">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Annual Spend</p>
+                        <h3 id="yearly-total" class="text-2xl font-extrabold mt-1 text-slate-100 transition-all duration-300 group-hover:text-amber-400">$0.00</h3>
+                    </div>
+                    <div class="bg-amber-500/10 p-3 rounded-xl text-amber-400 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="calendar-days" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between shadow-xl transition-all duration-300 backdrop-blur-sm">
+                    <div class="flex items-center justify-between w-full mb-1">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Budget Cap Limit</p>
+                        <div class="flex items-center text-xs font-bold text-slate-400 bg-slate-950 rounded-lg px-2 py-0.5 border border-slate-800">
+                            <span class="currency-label mr-0.5">$</span>
+                            <input type="number" id="budget-limit-input" value="200" onchange="updateBudgetCap()" class="bg-transparent w-12 text-slate-100 focus:outline-none text-right font-black">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full mt-1">
+                        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden p-0.5 border border-slate-800/80">
+                            <div id="budget-progress-bar" class="progress-transition bg-indigo-500 h-full rounded-full" style="width: 0%"></div>
+                        </div>
+                        <span id="budget-percent-label" class="text-xs font-black text-indigo-400 shrink-0">0%</span>
+                    </div>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl group hover:border-indigo-500/30 transition-all duration-300 backdrop-blur-sm">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Services</p>
+                        <h3 id="active-count" class="text-2xl font-extrabold mt-1 text-slate-100 transition-all duration-300 group-hover:text-indigo-400">0</h3>
+                    </div>
+                    <div class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2 bg-slate-900/30 border border-slate-800/80 p-6 rounded-2xl backdrop-blur-md shadow-lg flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-400"></i> Spending Distribution Breakdown
+                        </h3>
+                        <div id="chart-bar" class="w-full h-4 bg-slate-950 rounded-full flex overflow-hidden shadow-inner mb-6 p-0.5 border border-slate-800/50">
+                            </div>
+                    </div>
+                    <div id="chart-legend" class="flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate-400">
+                        </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-slate-900/60 to-slate-900/20 border border-slate-800/80 p-6 rounded-2xl backdrop-blur-md shadow-lg flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Financial Insight
+                        </h3>
+                        <p id="financial-advice" class="text-sm text-slate-300 leading-relaxed italic">
+                            No subscription costs calculated yet. Add assets to trigger custom tracking updates.
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-slate-800/60 flex justify-between items-center text-xs text-slate-500">
+                        <span>System Integrity: Secure</span>
+                        <button onclick="clearAllData()" class="text-slate-500 hover:text-rose-400 transition-colors flex items-center gap-1 font-medium">
+                            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Reset Data
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-slate-900/50 border border-slate-800/90 p-5 rounded-2xl shadow-xl backdrop-blur-xl">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
+                            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Quick-Add System Presets
+                        </h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="applyPreset('Netflix', 15.49, 'Entertainment')" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-left p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all text-xs font-semibold text-slate-300">
+                                <span class="text-rose-500 font-black">N</span> Netflix ($15.49)
+                            </button>
+                            <button onclick="applyPreset('Spotify', 11.99, 'Entertainment')" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-left p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all text-xs font-semibold text-slate-300">
+                                <span class="text-emerald-500 font-black">S</span> Spotify ($11.99)
+                            </button>
+                            <button onclick="applyPreset('AWS Cloud', 29.00, 'Work & Software')" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-left p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all text-xs font-semibold text-slate-300">
+                                <span class="text-amber-500 font-black">A</span> AWS Cloud ($29)
+                            </button>
+                            <button onclick="applyPreset('iCloud Plus', 2.99, 'Utilities')" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-left p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all text-xs font-semibold text-slate-300">
+                                <span class="text-cyan-400 font-black">I</span> iCloud+ ($2.99)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/50 border border-slate-800/90 p-6 rounded-2xl shadow-2xl shadow-slate-950/40 backdrop-blur-xl">
+                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-400">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i> Track Subscription
+                        </h2>
+                        
+                        <form id="sub-form" class="space-y-4">
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Service Name</label>
+                                <input type="text" id="sub-name" required placeholder="e.g. Netflix, Spotify, AWS" 
+                                    class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 shadow-inner">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Cost (<span class="currency-label">$</span>)</label>
+                                    <input type="number" id="sub-cost" required step="0.01" min="0" placeholder="14.99" 
+                                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Billing Cycle</label>
+                                    <select id="sub-cycle" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer">
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Category Grouping</label>
+                                <select id="sub-category" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer">
+                                    <option value="Entertainment">🍿 Entertainment</option>
+                                    <option value="Work & Software">💻 Work & Software</option>
+                                    <option value="Utilities">⚡ Utilities</option>
+                                    <option value="Health & Fitness">💪 Health & Fitness</option>
+                                    <option value="Other">📦 Other</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Next Renewal Date</label>
+                                <input type="date" id="sub-date" required
+                                    class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer">
+                            </div>
+
+                            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-indigo-600/10 active:scale-[0.99] flex items-center justify-center gap-2 mt-4 text-sm">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Add Tracked Item
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-4">
+                    
+                    <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl flex flex-col md:flex-row gap-3 items-center justify-between backdrop-blur-md shadow-md">
+                        <div class="relative w-full md:w-64">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+                            <input type="text" id="search-bar" oninput="filterAndRender()" placeholder="Search active items..." 
+                                class="w-full bg-slate-950 border border-slate-800 text-sm rounded-xl pl-10 pr-4 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors shadow-inner">
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+                            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800/80 w-full sm:w-auto justify-around">
+                                <button onclick="toggleQuickFilter('all')" id="qf-all" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-slate-900 text-indigo-400 transition-all">All</button>
+                                <button onclick="toggleQuickFilter('soon')" id="qf-soon" class="text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Soon</button>
+                                <button onclick="toggleQuickFilter('overdue')" id="qf-overdue" class="text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Overdue</button>
+                            </div>
+
+                            <select id="filter-category" onchange="filterAndRender()" class="w-full sm:w-auto text-xs font-semibold bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                <option value="all">All Categories</option>
+                                <option value="Entertainment">🍿 Entertainment</option>
+                                <option value="Work & Software">💻 Work & Software</option>
+                                <option value="Utilities">⚡ Utilities</option>
+                                <option value="Health & Fitness">💪 Health & Fitness</option>
+                                <option value="Other">📦 Other</option>
+                            </select>
+                            
+                            <select id="filter-sort" onchange="filterAndRender()" class="w-full sm:w-auto text-xs font-semibold bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                <option value="date">Sort by: Date</option>
+                                <option value="cost-desc">Sort by: Price (High-Low)</option>
+                                <option value="cost-asc">Sort by: Price (Low-High)</option>
+                                <option value="name">Sort by: Alphabetical</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center px-1">
+                        <h2 class="text-lg font-bold tracking-tight text-slate-300 flex items-center gap-2">
+                            Your Subscriptions <span id="list-count" class="text-[11px] bg-slate-900 text-indigo-400 px-2.5 py-0.5 rounded-full border border-slate-800 font-bold tracking-normal">0 Active</span>
+                        </h2>
+                    </div>
+
+                    <div id="subs-container" class="space-y-3.5">
+                        </div>
+
+                    <div id="empty-state" class="hidden border-2 border-dashed border-slate-800/80 rounded-2xl p-12 text-center text-slate-500 transition-all duration-500">
+                        <div class="inline-flex p-4 bg-slate-900/60 rounded-full mb-3 text-slate-600 border border-slate-800/40">
+                            <i data-lucide="inbox" class="w-8 h-8"></i>
+                        </div>
+                        <p class="text-base font-semibold text-slate-400">No matching subscriptions verified</p>
+                        <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">Create a tracking element or change your live parameters above to view targets.</p>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
 
     <script>
+        // --- AUTHENTICATION ROUTING AND GATEWAY INTERACTION ---
         let authMode = 'signin';
-        
-        // --- 1. CONFIGURATION FOR REAL GOOGLE SIGN-IN ---
-        // REPLACE THIS STRING WITH YOUR VALUE FROM THE GOOGLE DEVELOPER CONSOLE:
         const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
 
         function initGoogleAuth() {
             if (typeof google === 'undefined') {
-                // If library isn't loaded yet, try again in 200ms
                 setTimeout(initGoogleAuth, 200);
                 return;
             }
 
-            // Initializes the Google account setup mapping
             google.accounts.id.initialize({
                 client_id: GOOGLE_CLIENT_ID,
                 callback: handleGoogleCredentialResponse,
                 context: authMode === 'signup' ? 'signup' : 'signin'
             });
 
-            // Dynamically renders the secure official button inside our dark container shell
             google.accounts.id.renderButton(
                 document.getElementById("google-button-container"),
                 { 
@@ -200,41 +415,31 @@
                     size: "large", 
                     text: authMode === 'signup' ? 'signup_with' : 'signin_with',
                     shape: "pill",
-                    width: "382" // Fits the standard container profile grid neatly
+                    width: "382"
                 }
             );
         }
 
-        // --- 2. CALLBACK DECODER FUNCTION WHEN THE USER LOGS IN SUCCESSFULLY ---
         function handleGoogleCredentialResponse(response) {
             try {
-                // Google returns validation payload tokens as encoded JWTs
                 const base64Url = response.credential.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                 const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
                     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
 
-                // Parse user account credentials out of the decrypted stream object
                 const googleProfile = JSON.parse(jsonPayload);
-                
-                console.log("Real Google Authentication successful:", googleProfile);
-                
-                // Update workspace username profile header tags automatically using their real data
                 document.getElementById("user-display-tag").innerText = googleProfile.email;
                 
-                // Redirect straight onto the secure dashboard panel index stream
-                document.getElementById("auth-view").classList.add("hidden");
-                document.getElementById("dashboard-view").classList.remove("hidden");
+                transitionToDashboard();
             } catch (err) {
-                console.error("Token decoding parameters initialization error wrapper:", err);
+                console.error("Token decoding error:", err);
                 const errBox = document.getElementById("auth-error");
                 document.getElementById("auth-error-msg").innerText = "Security token handshake parsing error.";
                 errBox.classList.remove("hidden");
             }
         }
 
-        // --- 3. VIEW SYSTEM ROUTING CONTROLLER ---
         function navigateToAuth(mode = 'signin') {
             authMode = mode;
             document.getElementById("landing-view").classList.add("hidden");
@@ -262,8 +467,6 @@
                 usernameWrapper.classList.add("hidden");
                 document.getElementById("auth-username").required = false;
             }
-
-            // Re-render Google button whenever view states flip to switch button modes contextually
             initGoogleAuth();
         }
 
@@ -281,19 +484,338 @@
             event.preventDefault();
             const email = document.getElementById("auth-email").value;
             document.getElementById("user-display-tag").innerText = email;
-            
+            transitionToDashboard();
+        }
+
+        function transitionToDashboard() {
             document.getElementById("auth-view").classList.add("hidden");
+            document.getElementById("landing-view").classList.add("hidden");
             document.getElementById("dashboard-view").classList.remove("hidden");
+            updateMetricsAndCharts();
+            filterAndRender();
+            lucide.createIcons();
         }
 
         function logoutSession() {
             document.getElementById("dashboard-view").classList.add("hidden");
+            document.getElementById("auth-view").classList.add("hidden");
             document.getElementById("landing-view").classList.remove("hidden");
+            document.getElementById("auth-form").reset();
+            document.getElementById("auth-error").classList.add("hidden");
+            lucide.createIcons();
+        }
+
+
+        // --- CORE SUB-DATA COMPUTATION LOGIC SYSTEM ---
+        let subscriptions = JSON.parse(localStorage.getItem('subspace_data')) || [];
+        let currencySymbol = localStorage.getItem('subspace_currency') || '$';
+        let budgetCapUSD = parseFloat(localStorage.getItem('subspace_budget_cap')) || 200;
+        let activeQuickFilter = 'all'; 
+        
+        const currencyRates = { "$": 1.0, "€": 0.92, "£": 0.79, "¥": 155.50 };
+
+        const categoryMeta = {
+            'Entertainment': { color: 'bg-rose-500', border: 'border-rose-500/20', text: 'text-rose-400', label: '🍿 Entertainment' },
+            'Work & Software': { color: 'bg-indigo-500', border: 'border-indigo-500/20', text: 'text-indigo-400', label: '💻 Work' },
+            'Utilities': { color: 'bg-cyan-400', border: 'border-cyan-400/20', text: 'text-cyan-400', label: '⚡ Utilities' },
+            'Health & Fitness': { color: 'bg-emerald-500', border: 'border-emerald-500/20', text: 'text-emerald-400', label: '💪 Fitness' },
+            'Other': { color: 'bg-slate-400', border: 'border-slate-500/20', text: 'text-slate-400', label: '📦 Other' }
+        };
+
+        const form = document.getElementById('sub-form');
+        const subsContainer = document.getElementById('subs-container');
+        const emptyState = document.getElementById('empty-state');
+        const monthlyTotalEl = document.getElementById('monthly-total');
+        const yearlyTotalEl = document.getElementById('yearly-total');
+        const activeCountEl = document.getElementById('active-count');
+        const listCountEl = document.getElementById('list-count');
+        const financialAdviceEl = document.getElementById('financial-advice');
+
+        function initApp() {
+            document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('global-currency').value = currencySymbol;
+            document.getElementById('budget-limit-input').value = (budgetCapUSD * currencyRates[currencySymbol]).toFixed(0);
+            
+            updateFormCurrencyLabel();
+            initGoogleAuth();
+            lucide.createIcons();
+        }
+
+        function saveData() {
+            localStorage.setItem('subspace_data', JSON.stringify(subscriptions));
+            localStorage.setItem('subspace_currency', currencySymbol);
+            localStorage.setItem('subspace_budget_cap', budgetCapUSD);
+            updateFormCurrencyLabel();
+            updateMetricsAndCharts();
+            filterAndRender();
+        }
+
+        function changeCurrency(symbol) {
+            currencySymbol = symbol;
+            document.getElementById('budget-limit-input').value = (budgetCapUSD * currencyRates[currencySymbol]).toFixed(0);
+            saveData();
+        }
+
+        function updateFormCurrencyLabel() {
+            document.querySelectorAll('.currency-label').forEach(el => el.innerText = currencySymbol);
+        }
+
+        function updateBudgetCap() {
+            const inputVal = parseFloat(document.getElementById('budget-limit-input').value) || 0;
+            budgetCapUSD = inputVal / currencyRates[currencySymbol];
+            saveData();
+        }
+
+        function applyPreset(name, costUSD, category) {
+            const scaledCost = costUSD * currencyRates[currencySymbol];
+            document.getElementById('sub-name').value = name;
+            document.getElementById('sub-cost').value = scaledCost.toFixed(2);
+            document.getElementById('sub-category').value = category;
+            
+            const nameInp = document.getElementById('sub-name');
+            nameInp.classList.add('border-indigo-500');
+            setTimeout(() => nameInp.classList.remove('border-indigo-500'), 600);
+        }
+
+        function toggleQuickFilter(type) {
+            activeQuickFilter = type;
+            ['all', 'soon', 'overdue'].forEach(f => {
+                const btn = document.getElementById(`qf-${f}`);
+                if (f === type) {
+                    btn.classList.add('bg-slate-900', 'text-indigo-400');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-slate-900', 'text-indigo-400');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+            filterAndRender();
+        }
+
+        function getConvertedCost(sub) {
+            const originalCost = parseFloat(sub.cost) || 0;
+            const originalCurrency = sub.currency || "$";
+            if (originalCurrency === currencySymbol) return originalCost;
+            return (originalCost / currencyRates[originalCurrency]) * currencyRates[currencySymbol];
+        }
+
+        function updateMetricsAndCharts() {
+            if (document.getElementById("dashboard-view").classList.contains("hidden")) return;
+            
+            let monthlyBurn = 0;
+            let breakdown = { 'Entertainment': 0, 'Work & Software': 0, 'Utilities': 0, 'Health & Fitness': 0, 'Other': 0 };
+
+            subscriptions.forEach(sub => {
+                const convertedCost = getConvertedCost(sub);
+                let normalizedMonthly = sub.cycle === 'monthly' ? convertedCost : (convertedCost / 12);
+                monthlyBurn += normalizedMonthly;
+                breakdown[sub.category] !== undefined ? breakdown[sub.category] += normalizedMonthly : breakdown['Other'] += normalizedMonthly;
+            });
+
+            animateValue(monthlyTotalEl, monthlyBurn, true);
+            animateValue(yearlyTotalEl, monthlyBurn * 12, true);
+            animateValue(activeCountEl, subscriptions.length, false);
+
+            const currentCapLocalized = budgetCapUSD * currencyRates[currencySymbol];
+            let percentUsed = currentCapLocalized > 0 ? Math.min((monthlyBurn / currentCapLocalized) * 100, 100) : 0;
+            
+            const progressBar = document.getElementById('budget-progress-bar');
+            const progressLabel = document.getElementById('budget-percent-label');
+            progressBar.style.width = `${percentUsed}%`;
+            progressLabel.innerText = `${Math.round(percentUsed)}%`;
+
+            if(percentUsed >= 90) {
+                progressBar.className = "progress-transition bg-rose-500 h-full rounded-full shadow-lg shadow-rose-500/40";
+                progressLabel.className = "text-xs font-black text-rose-400 shrink-0 animate-pulse";
+            } else if(percentUsed >= 70) {
+                progressBar.className = "progress-transition bg-amber-500 h-full rounded-full shadow-lg shadow-amber-500/30";
+                progressLabel.className = "text-xs font-black text-amber-400 shrink-0";
+            } else {
+                progressBar.className = "progress-transition bg-indigo-500 h-full rounded-full shadow-lg shadow-indigo-500/20";
+                progressLabel.className = "text-xs font-black text-indigo-400 shrink-0";
+            }
+
+            updateFinancialAdvice(monthlyBurn, breakdown);
+
+            const barContainer = document.getElementById('chart-bar');
+            const legendContainer = document.getElementById('chart-legend');
+            if (monthlyBurn === 0) {
+                barContainer.innerHTML = `<div class="w-full bg-slate-900 rounded-full"></div>`;
+                legendContainer.innerHTML = `<span class="text-slate-500 italic">No spending tracking metrics compiled yet</span>`;
+                return;
+            }
+
+            let barHtml = ''; let legendHtml = '';
+            Object.keys(breakdown).forEach(cat => {
+                const amount = breakdown[cat];
+                if (amount > 0) {
+                    const percentage = ((amount / monthlyBurn) * 100).toFixed(1);
+                    barHtml += `<div class="${categoryMeta[cat].color} h-full transition-all duration-500" style="width: ${percentage}%"></div>`;
+                    legendHtml += `
+                        <div class="flex items-center gap-2 bg-slate-900/60 px-2.5 py-1.5 rounded-lg border border-slate-800/60 shadow-sm animate-render">
+                            <span class="w-2 h-2 rounded-full ${categoryMeta[cat].color}"></span>
+                            <span class="text-slate-300 font-semibold">${categoryMeta[cat].label}</span>
+                            <span class="text-slate-500 font-bold">${percentage}%</span>
+                        </div>`;
+                }
+            });
+            barContainer.innerHTML = barHtml; legendContainer.innerHTML = legendHtml;
+        }
+
+        function updateFinancialAdvice(totalBurn, breakdown) {
+            if (totalBurn === 0) {
+                financialAdviceEl.innerText = "No subscription costs calculated yet. Add assets to trigger custom tracking updates.";
+                return;
+            }
+            let highestCategory = 'Entertainment'; let maxSpending = 0;
+            Object.keys(breakdown).forEach(cat => { if (breakdown[cat] > maxSpending) { maxSpending = breakdown[cat]; highestCategory = cat; } });
+
+            const targetCapLocalized = budgetCapUSD * currencyRates[currencySymbol];
+            if(totalBurn > targetCapLocalized) {
+                financialAdviceEl.innerHTML = `🚨 <span class="text-rose-400 font-bold">Budget breached!</span> You are over your limits by ${currencySymbol}${(totalBurn - targetCapLocalized).toFixed(2)}. Trim items down immediately.`;
+            } else if (totalBurn > targetCapLocalized * 0.75) {
+                financialAdviceEl.innerHTML = `⚠️ Approaching your safe ceiling maximums. <span class="text-amber-400 font-bold">${categoryMeta[highestCategory].label}</span> is draining capital reserves heavily. Exercise caution.`;
+            } else {
+                financialAdviceEl.innerHTML = `✨ Portfolio healthy. Your top budget focus rests in <span class="text-indigo-400 font-bold">${categoryMeta[highestCategory].label}</span>. Maintain current oversight parameters.`;
+            }
+        }
+
+        function animateValue(element, targetValue, isCurrency) {
+            let startTimestamp = null; const duration = 400; 
+            const startValue = parseFloat(element.innerText.replace(/[^0-9.]/g, '')) || 0;
+            function step(timestamp) {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = startValue + progress * (targetValue - startValue);
+                element.innerText = isCurrency ? `${currencySymbol}${currentValue.toFixed(2)}` : Math.floor(currentValue);
+                if (progress < 1) window.requestAnimationFrame(step);
+                else element.innerText = isCurrency ? `${currencySymbol}${targetValue.toFixed(2)}` : targetValue;
+            }
+            window.requestAnimationFrame(step);
+        }
+
+        function filterAndRender() {
+            if (document.getElementById("dashboard-view").classList.contains("hidden")) return;
+
+            const searchQuery = document.getElementById('search-bar').value.toLowerCase().trim();
+            const selectedCategory = document.getElementById('filter-category').value;
+            const activeSort = document.getElementById('filter-sort').value;
+
+            let filteredSubs = subscriptions.filter(sub => {
+                const matchesSearch = sub.name.toLowerCase().includes(searchQuery);
+                const matchesCategory = selectedCategory === 'all' || sub.category === selectedCategory;
+                
+                const parsedDate = new Date(sub.date + 'T00:00:00');
+                const today = new Date(); today.setHours(0,0,0,0);
+                const daysUntil = Math.ceil((parsedDate - today) / (1000 * 60 * 60 * 24));
+                
+                let matchesQuickFilter = true;
+                if(activeQuickFilter === 'soon') matchesQuickFilter = (daysUntil >= 0 && daysUntil <= 3);
+                if(activeQuickFilter === 'overdue') matchesQuickFilter = (daysUntil < 0);
+
+                return matchesSearch && matchesCategory && matchesQuickFilter;
+            });
+
+            if (activeSort === 'date') filteredSubs.sort((a, b) => new Date(a.date) - new Date(b.date));
+            else if (activeSort === 'cost-desc') filteredSubs.sort((a, b) => getConvertedCost(b) - getConvertedCost(a));
+            else if (activeSort === 'cost-asc') filteredSubs.sort((a, b) => getConvertedCost(a) - getConvertedCost(b));
+            else if (activeSort === 'name') filteredSubs.sort((a, b) => a.name.localeCompare(b.name));
+
+            listCountEl.innerText = `${filteredSubs.length} Items`;
+            renderList(filteredSubs);
+        }
+
+        function renderList(targetArray) {
+            if (targetArray.length === 0) { subsContainer.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
+            emptyState.classList.add('hidden');
+
+            subsContainer.innerHTML = targetArray.map((sub, index) => {
+                const costFormatted = getConvertedCost(sub).toFixed(2);
+                const parsedDate = new Date(sub.date + 'T00:00:00');
+                const displayDate = parsedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const today = new Date(); today.setHours(0,0,0,0);
+                const daysUntil = Math.ceil((parsedDate - today) / (1000 * 60 * 60 * 24));
+                
+                let criticalTagHtml = '';
+                if (daysUntil >= 0 && daysUntil <= 3) criticalTagHtml = `<span class="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider animate-pulse">Renewing Soon</span>`;
+                else if (daysUntil < 0) criticalTagHtml = `<span class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Overdue</span>`;
+
+                const meta = categoryMeta[sub.category] || categoryMeta['Other'];
+
+                return `
+                    <div class="bg-slate-900/40 border border-slate-900/80 hover:border-slate-800 hover:bg-slate-900/70 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-300 group hover:scale-[1.01] hover:shadow-xl hover:shadow-slate-950/20 animate-render" style="animation-delay: ${index * 0.04}s">
+                        <div class="flex items-start gap-3.5 w-full sm:w-auto">
+                            <div class="bg-slate-950 border border-slate-800 group-hover:border-indigo-500/40 h-12 w-12 rounded-xl flex items-center justify-center font-black text-xl text-indigo-400 shrink-0 transition-colors duration-300 shadow-inner">
+                                ${sub.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="truncate">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h4 class="font-bold text-slate-200 group-hover:text-white transition-colors duration-300 truncate max-w-[160px] tracking-tight">${sub.name}</h4>
+                                    <span class="text-[10px] font-bold ${meta.text} bg-slate-950 border ${meta.border} px-2.5 py-0.5 rounded-full uppercase tracking-wider">${meta.label}</span>
+                                    ${criticalTagHtml}
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1.5 flex items-center gap-1.5 font-medium">
+                                    <i data-lucide="bell" class="w-3.5 h-3.5 text-slate-500"></i> Next Invoice: <span class="text-slate-300 font-semibold">${displayDate}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t border-slate-900 sm:border-0 pt-3 sm:pt-0">
+                            <div class="text-left sm:text-right">
+                                <span class="text-xl font-black text-slate-100 group-hover:text-indigo-400 transition-colors duration-300">${currencySymbol}${costFormatted}</span>
+                                <span class="text-[10px] font-bold text-slate-500 block uppercase tracking-widest">${sub.cycle === 'monthly' ? 'per month' : 'per year'}</span>
+                            </div>
+                            <button type="button" onclick="deleteSubscription('${sub.id}')" class="text-slate-500 hover:text-rose-400 p-2.5 rounded-xl hover:bg-rose-500/10 transition-all duration-200 active:scale-90">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newSubscription = {
+                id: 'sub_' + Date.now(),
+                name: document.getElementById('sub-name').value,
+                cost: document.getElementById('sub-cost').value,
+                cycle: document.getElementById('sub-cycle').value,
+                category: document.getElementById('sub-category').value,
+                date: document.getElementById('sub-date').value,
+                currency: currencySymbol
+            };
+            subscriptions.push(newSubscription);
+            saveData();
+            form.reset();
+            document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
+        });
+
+        window.deleteSubscription = function(id) { subscriptions = subscriptions.filter(sub => sub.id !== id); saveData(); };
+        function clearAllData() { if (confirm("Are you absolutely sure you want to clear your local database? This operation cannot be undone.")) { subscriptions = []; saveData(); } }
+
+        function exportData() {
+            if(subscriptions.length === 0) { alert("There is no subscription data to export yet!"); return; }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(subscriptions));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", `subspace_pro_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    if (Array.isArray(parsedData)) { subscriptions = parsedData; saveData(); }
+                    else { alert("Invalid backup format architecture."); }
+                } catch (err) { alert("Error processing backup source file."); }
+            };
+            if(event.target.files[0]) fileReader.readAsText(event.target.files[0]);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            initGoogleAuth();
+            initApp();
         });
     </script>
 </body>
