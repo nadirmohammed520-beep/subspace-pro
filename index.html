@@ -6,7 +6,10 @@
     <title>SubSpace Pro // Multi-View Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -22,8 +25,6 @@
             50% { opacity: 0.45; }
         }
         .glow-effect { animation: pulseGlow 3s ease-in-out infinite; }
-        
-        /* Custom progress bar transitions */
         .progress-transition { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; }
     </style>
 </head>
@@ -70,7 +71,6 @@
     </div>
 
     <div id="auth-view" class="hidden min-h-screen flex flex-col items-center justify-center p-4 relative z-10">
-        
         <button onclick="navigateToLanding()" class="absolute top-6 left-6 flex items-center gap-3 bg-transparent border-none cursor-pointer group active:scale-95 transition-transform" title="Return to Home Screen">
             <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-600/20 group-hover:from-indigo-500 group-hover:to-violet-400 transition-colors">
                 <i data-lucide="credit-card" class="w-5 h-5"></i>
@@ -79,7 +79,6 @@
         </button>
 
         <div class="w-full max-w-md bg-slate-900/40 border border-slate-800/80 p-8 rounded-2xl backdrop-blur-xl shadow-2xl shadow-slate-950/50 text-center animate-render mt-12">
-            
             <div class="inline-flex bg-gradient-to-tr from-indigo-600 to-violet-500 p-3 rounded-2xl text-white shadow-lg shadow-indigo-600/20 mb-4">
                 <i data-lucide="credit-card" class="w-6 h-6"></i>
             </div>
@@ -88,29 +87,10 @@
 
             <div id="auth-error" class="hidden mb-4 p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-left flex items-center gap-2.5 text-xs font-semibold text-rose-400 animate-render">
                 <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i>
-                <span id="auth-error-msg">Invalid credential properties provided.</span>
-            </div>
-
-            <div class="mb-5 flex justify-center w-full">
-                <div id="google-button-container" class="w-full"></div>
-            </div>
-
-            <div class="relative flex py-2 items-center mb-5">
-                <div class="flex-grow border-t border-slate-800/80"></div>
-                <span class="flex-shrink mx-4 text-[10px] uppercase tracking-widest text-slate-500 font-bold">Or use password entry</span>
-                <div class="flex-grow border-t border-slate-800/80"></div>
+                <span id="auth-error-msg">Invalid credentials matching configuration tokens.</span>
             </div>
 
             <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4 text-left">
-                <div id="username-field-wrapper" class="hidden">
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Account Username</label>
-                    <div class="relative">
-                        <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
-                        <input type="text" id="auth-username" placeholder="Enter your username" 
-                            class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-10 pr-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 text-sm">
-                    </div>
-                </div>
-
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Email Address</label>
                     <div class="relative">
@@ -144,17 +124,17 @@
     <div id="dashboard-view" class="hidden min-h-screen flex flex-col">
         <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-xl sticky top-0 z-50 transition-all duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3 group cursor-pointer" onclick="navigateToLanding()">
-                    <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-600/20 group-hover:scale-105 transition-transform duration-300">
+                <div onclick="navigateToLanding()" class="flex items-center gap-3 group cursor-pointer active:scale-95 transition-transform">
+                    <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-600/20 group-hover:from-indigo-500 group-hover:to-violet-400 transition-colors">
                         <i data-lucide="credit-card" class="w-5 h-5"></i>
                     </div>
-                    <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">SubSpace<span class="text-xs ml-1 px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">PRO</span></span>
+                    <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent group-hover:from-indigo-300 group-hover:to-pink-300 transition-colors">SubSpace<span class="text-xs ml-1 px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700 font-sans tracking-normal">PRO</span></span>
                 </div>
                 
                 <div class="flex items-center gap-3 flex-wrap justify-center">
                     <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300">
                         <i data-lucide="user-check" class="w-3.5 h-3.5 mr-2 text-indigo-400"></i>
-                        <span id="user-display-tag" class="font-bold truncate max-w-[140px]">Active Session</span>
+                        <span id="user-display-tag" class="font-bold">Authenticated Profile</span>
                     </div>
 
                     <div class="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-inner hover:border-slate-700 transition-colors">
@@ -167,15 +147,15 @@
                         </select>
                     </div>
 
-                    <div class="flex gap-2">
-                        <button onclick="exportData()" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md" title="Export JSON Backup">
+                    <div class="flex gap-1.5">
+                        <button onclick="exportData()" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md" title="Export JSON Data Store">
                             <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
                         </button>
-                        <label class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md cursor-pointer" title="Import JSON Backup">
+                        <label class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md cursor-pointer" title="Import JSON Configurations Profile">
                             <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import
                             <input type="file" id="import-file" onchange="importData(event)" class="hidden" accept=".json">
                         </label>
-                        <button onclick="logoutSession()" class="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-900/30 text-slate-400 hover:text-rose-400 rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md" title="Log Out Session">
+                        <button onclick="logoutSession()" class="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-900/30 text-slate-400 hover:text-rose-400 rounded-xl text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md" title="Disconnect Session Authorization Portal">
                             <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
@@ -184,7 +164,6 @@
         </header>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10 w-full flex-1">
-            
             <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl group hover:border-rose-500/30 transition-all duration-300 backdrop-blur-sm">
                     <div>
@@ -213,7 +192,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3 w-full mt-1">
-                        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden p-0.5 border border-slate-800/80">
+                        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden p-0.5 border border-slate-800/50">
                             <div id="budget-progress-bar" class="progress-transition bg-indigo-500 h-full rounded-full" style="width: 0%"></div>
                         </div>
                         <span id="budget-percent-label" class="text-xs font-black text-indigo-400 shrink-0">0%</span>
@@ -236,11 +215,10 @@
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                             <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-400"></i> Spending Distribution Breakdown
                         </h3>
-                        <div id="chart-bar" class="w-full h-4 bg-slate-950 rounded-full flex overflow-hidden shadow-inner mb-6 p-0.5 border border-slate-800/50">
-                            </div>
+                        <div id="chart-bar" class="w-full h-4 bg-slate-950 rounded-full flex overflow-hidden shadow-inner mb-6 p-0.5 border border-slate-800/50"></div>
                     </div>
-                    <div id="chart-legend" class="flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate-400">
-                        </div>
+                    <div id="chart-legend" class="flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate-400 mb-6"></div>
+                    <div id="category-breakdown-grid" class="grid grid-cols-2 md:grid-cols-5 gap-2 pt-4 border-t border-slate-800"></div>
                 </div>
                 
                 <div class="bg-gradient-to-br from-slate-900/60 to-slate-900/20 border border-slate-800/80 p-6 rounded-2xl backdrop-blur-md shadow-lg flex flex-col justify-between">
@@ -249,24 +227,23 @@
                             <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Financial Insight
                         </h3>
                         <p id="financial-advice" class="text-sm text-slate-300 leading-relaxed italic">
-                            No subscription costs calculated yet. Add assets to trigger custom tracking updates.
+                            No active items checked. Initialize structural entries to trigger analysis arrays logs.
                         </p>
                     </div>
                     <div class="pt-4 border-t border-slate-800/60 flex justify-between items-center text-xs text-slate-500">
-                        <span>System Integrity: Secure</span>
+                        <span>Status: Cloud Synchronized</span>
                         <button onclick="clearAllData()" class="text-slate-500 hover:text-rose-400 transition-colors flex items-center gap-1 font-medium">
-                            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Reset Data
+                            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Clear Deck
                         </button>
                     </div>
                 </div>
             </section>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
                 <div class="lg:col-span-1 space-y-6">
                     <div class="bg-slate-900/50 border border-slate-800/90 p-5 rounded-2xl shadow-xl backdrop-blur-xl">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
-                            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Quick-Add System Presets
+                            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Quick Presets
                         </h3>
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="applyPreset('Netflix', 15.49, 'Entertainment')" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-left p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all text-xs font-semibold text-slate-300">
@@ -284,27 +261,28 @@
                         </div>
                     </div>
 
-                    <div class="bg-slate-900/50 border border-slate-800/90 p-6 rounded-2xl shadow-2xl shadow-slate-950/40 backdrop-blur-xl">
-                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-400">
-                            <i data-lucide="plus-circle" class="w-5 h-5"></i> Track Subscription
+                    <div class="bg-slate-900/50 border border-slate-800/90 p-6 rounded-2xl shadow-2xl backdrop-blur-xl">
+                        <h2 id="form-heading" class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-400">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i> Track New Asset
                         </h2>
                         
                         <form id="sub-form" class="space-y-4">
+                            <input type="hidden" id="edit-index" value="-1">
                             <div>
                                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Service Name</label>
-                                <input type="text" id="sub-name" required placeholder="e.g. Netflix, Spotify, AWS" 
-                                    class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 shadow-inner">
+                                <input type="text" id="sub-name" required placeholder="e.g. Netflix, Photoshop, AWS" 
+                                    class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 shadow-inner text-sm">
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Cost (<span class="currency-label">$</span>)</label>
                                     <input type="number" id="sub-cost" required step="0.01" min="0" placeholder="14.99" 
-                                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 shadow-inner">
+                                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 shadow-inner text-sm">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Billing Cycle</label>
-                                    <select id="sub-cycle" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer">
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Billing Interval</label>
+                                    <select id="sub-cycle" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
                                         <option value="monthly">Monthly</option>
                                         <option value="yearly">Yearly</option>
                                     </select>
@@ -313,7 +291,7 @@
 
                             <div>
                                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Category Grouping</label>
-                                <select id="sub-category" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer">
+                                <select id="sub-category" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
                                     <option value="Entertainment">🍿 Entertainment</option>
                                     <option value="Work & Software">💻 Work & Software</option>
                                     <option value="Utilities">⚡ Utilities</option>
@@ -323,12 +301,12 @@
                             </div>
 
                             <div>
-                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Next Renewal Date</label>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Next Billing Date</label>
                                 <input type="date" id="sub-date" required
-                                    class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer">
+                                    class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
                             </div>
 
-                            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-indigo-600/10 active:scale-[0.99] flex items-center justify-center gap-2 mt-4 text-sm">
+                            <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-indigo-600/10 active:scale-[0.99] flex items-center justify-center gap-2 mt-4 text-sm">
                                 <i data-lucide="plus" class="w-4 h-4"></i> Add Tracked Item
                             </button>
                         </form>
@@ -336,9 +314,8 @@
                 </div>
 
                 <div class="lg:col-span-2 space-y-4">
-                    
                     <div class="bg-slate-900/40 border border-slate-800/80 p-4 rounded-2xl flex flex-col md:flex-row gap-3 items-center justify-between backdrop-blur-md shadow-md">
-                        <div class="relative w-full md:w-64">
+                        <div class="relative w-full md:w-62">
                             <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
                             <input type="text" id="search-bar" oninput="filterAndRender()" placeholder="Search active items..." 
                                 class="w-full bg-slate-950 border border-slate-800 text-sm rounded-xl pl-10 pr-4 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors shadow-inner">
@@ -371,103 +348,49 @@
 
                     <div class="flex justify-between items-center px-1">
                         <h2 class="text-lg font-bold tracking-tight text-slate-300 flex items-center gap-2">
-                            Your Subscriptions <span id="list-count" class="text-[11px] bg-slate-900 text-indigo-400 px-2.5 py-0.5 rounded-full border border-slate-800 font-bold tracking-normal">0 Active</span>
+                            Monitored Subscriptions <span id="list-count" class="text-[11px] bg-slate-900 text-indigo-400 px-2.5 py-0.5 rounded-full border border-slate-800 font-bold tracking-normal">0 Active</span>
                         </h2>
                     </div>
 
-                    <div id="subs-container" class="space-y-3.5">
-                        </div>
+                    <div id="subs-container" class="space-y-3.5"></div>
 
                     <div id="empty-state" class="hidden border-2 border-dashed border-slate-800/80 rounded-2xl p-12 text-center text-slate-500 transition-all duration-500">
                         <div class="inline-flex p-4 bg-slate-900/60 rounded-full mb-3 text-slate-600 border border-slate-800/40">
                             <i data-lucide="inbox" class="w-8 h-8"></i>
                         </div>
-                        <p class="text-base font-semibold text-slate-400">No matching subscriptions verified</p>
-                        <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">Create a tracking element or change your live parameters above to view targets.</p>
+                        <p class="text-base font-semibold text-slate-400">No active assets match query criteria</p>
+                        <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">Create a deployment tracking record or modify live parameter search strings above.</p>
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
 
     <script>
-        // --- AUTHENTICATION ROUTING AND GATEWAY INTERACTION ---
-        let authMode = 'signin';
-        const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+        // --- FIREBASE INITIALIZATION ENGINE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBMNFD1LaB_NwzFoUMBEE8HqScwuxj0hZo",
+            authDomain: "subspace-pro-9cf7a.firebaseapp.com",
+            projectId: "subspace-pro-9cf7a",
+            storageBucket: "subspace-pro-9cf7a.appspot.com",
+            messagingSenderId: "462115634352",
+            appId: "1:462115634352:web:8a2a2213e269b74928cf75",
+            measurementId: "G-XQRCfZNBS5"
+        };
 
-        function initGoogleAuth() {
-            if (typeof google === 'undefined') {
-                setTimeout(initGoogleAuth, 200);
-                return;
-            }
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
-            google.accounts.id.initialize({
-                client_id: GOOGLE_CLIENT_ID,
-                callback: handleGoogleCredentialResponse,
-                context: authMode === 'signup' ? 'signup' : 'signin'
-            });
-
-            google.accounts.id.renderButton(
-                document.getElementById("google-button-container"),
-                { 
-                    theme: "dark", 
-                    size: "large", 
-                    text: authMode === 'signup' ? 'signup_with' : 'signin_with',
-                    shape: "pill",
-                    width: "382"
-                }
-            );
-        }
-
-        function handleGoogleCredentialResponse(response) {
-            try {
-                const base64Url = response.credential.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-
-                const googleProfile = JSON.parse(jsonPayload);
-                document.getElementById("user-display-tag").innerText = googleProfile.email;
-                
-                transitionToDashboard();
-            } catch (err) {
-                console.error("Token decoding error:", err);
-                const errBox = document.getElementById("auth-error");
-                document.getElementById("auth-error-msg").innerText = "Security token handshake parsing error.";
-                errBox.classList.remove("hidden");
-            }
-        }
-
+        // --- VIEW NAVIGATION ---
         function navigateToAuth(mode = 'signin') {
-            authMode = mode;
             document.getElementById("landing-view").classList.add("hidden");
             document.getElementById("dashboard-view").classList.add("hidden");
             document.getElementById("auth-view").classList.remove("hidden");
-            document.getElementById("auth-error").classList.add("hidden");
             
-            const submitBtnText = document.getElementById("auth-submit-btn").querySelector("span");
-            const switchPrompt = document.getElementById("switch-prompt-text");
-            const switchBtn = document.getElementById("switch-mode-btn");
-            const usernameWrapper = document.getElementById("username-field-wrapper");
-
-            if (mode === 'signup') {
-                document.getElementById("auth-subtitle").innerText = "Create your secure multi-platform profile configuration";
-                submitBtnText.innerText = "Deploy Account Suite";
-                switchPrompt.innerText = "Already configured a profile entry?";
-                switchBtn.innerText = "Log In";
-                usernameWrapper.classList.remove("hidden");
-                document.getElementById("auth-username").required = true;
-            } else {
-                document.getElementById("auth-subtitle").innerText = "Secure multi-platform premium subscription architecture";
-                submitBtnText.innerText = "Access Dashboard";
-                switchPrompt.innerText = "Don't have an active suite profile?";
-                switchBtn.innerText = "Create Account";
-                usernameWrapper.classList.add("hidden");
-                document.getElementById("auth-username").required = false;
+            if (authMode !== mode) {
+                toggleAuthMode();
             }
-            initGoogleAuth();
         }
 
         function navigateToLanding() {
@@ -476,41 +399,85 @@
             document.getElementById("landing-view").classList.remove("hidden");
         }
 
+        // --- AUTH PORTAL STATE ENGINE ---
+        let authMode = "signin";
+
+        function showErrorAlert(message) {
+            const errorBlock = document.getElementById("auth-error");
+            const errorMsg = document.getElementById("auth-error-msg");
+            errorMsg.innerText = message;
+            errorBlock.classList.remove("hidden");
+        }
+
+        function hideErrorAlert() {
+            document.getElementById("auth-error").classList.add("hidden");
+        }
+
         function toggleAuthMode() {
-            navigateToAuth(authMode === 'signin' ? 'signup' : 'signin');
-        }
+            const subtitle = document.getElementById("auth-subtitle");
+            const submitBtn = document.getElementById("auth-submit-btn");
+            const promptText = document.getElementById("switch-prompt-text");
+            const modeBtn = document.getElementById("switch-mode-btn");
+            const form = document.getElementById("auth-form");
+            
+            form.reset();
+            hideErrorAlert();
 
-        function handleAuthSubmit(event) {
-            event.preventDefault();
-            const email = document.getElementById("auth-email").value;
-            document.getElementById("user-display-tag").innerText = email;
-            transitionToDashboard();
-        }
-
-        function transitionToDashboard() {
-            document.getElementById("auth-view").classList.add("hidden");
-            document.getElementById("landing-view").classList.add("hidden");
-            document.getElementById("dashboard-view").classList.remove("hidden");
-            updateMetricsAndCharts();
-            filterAndRender();
+            if (authMode === "signin") {
+                authMode = "signup";
+                subtitle.innerText = "Provision an absolute premium deployment environment profile";
+                submitBtn.innerHTML = `<span>Provision Account</span> <i data-lucide="user-plus" class="w-4 h-4"></i>`;
+                promptText.innerText = "Already possess an active suite profile?";
+                modeBtn.innerText = "Sign In Instead";
+            } else {
+                authMode = "signin";
+                subtitle.innerText = "Secure multi-platform premium subscription architecture";
+                submitBtn.innerHTML = `<span>Access Dashboard</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+                promptText.innerText = "Don't have an active suite profile?";
+                modeBtn.innerText = "Create Account";
+            }
             lucide.createIcons();
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            hideErrorAlert();
+            
+            const email = document.getElementById("auth-email").value.trim();
+            const password = document.getElementById("auth-password").value;
+            
+            if (authMode === "signup") {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        alert("Account framework provisioned successfully! Welcome aboard.");
+                    })
+                    .catch((error) => {
+                        showErrorAlert(error.message);
+                    });
+            } else {
+                auth.signInWithEmailAndPassword(email, password)
+                    .catch((error) => {
+                        showErrorAlert("Access denied. " + error.message);
+                    });
+            }
         }
 
         function logoutSession() {
-            document.getElementById("dashboard-view").classList.add("hidden");
-            document.getElementById("auth-view").classList.add("hidden");
-            document.getElementById("landing-view").classList.remove("hidden");
-            document.getElementById("auth-form").reset();
-            document.getElementById("auth-error").classList.add("hidden");
-            lucide.createIcons();
+            auth.signOut().then(() => {
+                document.getElementById("auth-form").reset();
+                document.getElementById("dashboard-view").classList.add("hidden");
+                document.getElementById("landing-view").classList.remove("hidden");
+                authMode = "signin"; 
+                hideErrorAlert();
+            });
         }
 
-
-        // --- CORE SUB-DATA COMPUTATION LOGIC SYSTEM ---
-        let subscriptions = JSON.parse(localStorage.getItem('subspace_data')) || [];
-        let currencySymbol = localStorage.getItem('subspace_currency') || '$';
-        let budgetCapUSD = parseFloat(localStorage.getItem('subspace_budget_cap')) || 200;
+        // --- APPLICATION SUBSCRIPTION DATA LAYER ---
+        let subscriptions = [];
+        let currencySymbol = '$';
+        let budgetCapUSD = 200;
         let activeQuickFilter = 'all'; 
+        let activeUserKey = null; 
         
         const currencyRates = { "$": 1.0, "€": 0.92, "£": 0.79, "¥": 155.50 };
 
@@ -531,23 +498,46 @@
         const listCountEl = document.getElementById('list-count');
         const financialAdviceEl = document.getElementById('financial-advice');
 
-        function initApp() {
+        function initDashboardEngine(userEmail) {
+            activeUserKey = btoa(userEmail); 
+            
+            subscriptions = JSON.parse(localStorage.getItem(`subspace_records_${activeUserKey}`)) || [];
+            currencySymbol = localStorage.getItem(`subspace_${activeUserKey}_currency`) || '$';
+            budgetCapUSD = parseFloat(localStorage.getItem(`subspace_${activeUserKey}_budget_cap`)) || 200;
+
+            document.getElementById('user-display-tag').innerText = userEmail;
             document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('global-currency').value = currencySymbol;
             document.getElementById('budget-limit-input').value = (budgetCapUSD * currencyRates[currencySymbol]).toFixed(0);
             
             updateFormCurrencyLabel();
-            initGoogleAuth();
+            updateMetricsAndCharts();
+            filterAndRender();
             lucide.createIcons();
         }
 
         function saveData() {
-            localStorage.setItem('subspace_data', JSON.stringify(subscriptions));
-            localStorage.setItem('subspace_currency', currencySymbol);
-            localStorage.setItem('subspace_budget_cap', budgetCapUSD);
+            if (!activeUserKey) return;
+            localStorage.setItem(`subspace_records_${activeUserKey}`, JSON.stringify(subscriptions));
+            localStorage.setItem(`subspace_${activeUserKey}_currency`, currencySymbol);
+            localStorage.setItem(`subspace_${activeUserKey}_budget_cap`, budgetCapUSD);
+            
             updateFormCurrencyLabel();
             updateMetricsAndCharts();
             filterAndRender();
+        }
+
+        function editSubscription(index) {
+            const sub = subscriptions[index];
+            document.getElementById('sub-name').value = sub.name;
+            document.getElementById('sub-cost').value = sub.cost;
+            document.getElementById('sub-cycle').value = sub.cycle;
+            document.getElementById('sub-category').value = sub.category;
+            document.getElementById('sub-date').value = sub.date;
+            document.getElementById('edit-index').value = index;
+            document.getElementById('form-heading').innerText = "Edit Asset";
+            document.getElementById('submit-btn').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Save Changes';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function changeCurrency(symbol) {
@@ -571,10 +561,9 @@
             document.getElementById('sub-name').value = name;
             document.getElementById('sub-cost').value = scaledCost.toFixed(2);
             document.getElementById('sub-category').value = category;
-            
-            const nameInp = document.getElementById('sub-name');
-            nameInp.classList.add('border-indigo-500');
-            setTimeout(() => nameInp.classList.remove('border-indigo-500'), 600);
+            document.getElementById('edit-index').value = -1;
+            document.getElementById('form-heading').innerText = "Track New Asset";
+            document.getElementById('submit-btn').innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Add Tracked Item';
         }
 
         function toggleQuickFilter(type) {
@@ -600,8 +589,6 @@
         }
 
         function updateMetricsAndCharts() {
-            if (document.getElementById("dashboard-view").classList.contains("hidden")) return;
-            
             let monthlyBurn = 0;
             let breakdown = { 'Entertainment': 0, 'Work & Software': 0, 'Utilities': 0, 'Health & Fitness': 0, 'Other': 0 };
 
@@ -609,7 +596,11 @@
                 const convertedCost = getConvertedCost(sub);
                 let normalizedMonthly = sub.cycle === 'monthly' ? convertedCost : (convertedCost / 12);
                 monthlyBurn += normalizedMonthly;
-                breakdown[sub.category] !== undefined ? breakdown[sub.category] += normalizedMonthly : breakdown['Other'] += normalizedMonthly;
+                if (breakdown[sub.category] !== undefined) {
+                    breakdown[sub.category] += normalizedMonthly;
+                } else {
+                    breakdown['Other'] += normalizedMonthly;
+                }
             });
 
             animateValue(monthlyTotalEl, monthlyBurn, true);
@@ -623,6 +614,14 @@
             const progressLabel = document.getElementById('budget-percent-label');
             progressBar.style.width = `${percentUsed}%`;
             progressLabel.innerText = `${Math.round(percentUsed)}%`;
+
+            const grid = document.getElementById('category-breakdown-grid');
+            grid.innerHTML = Object.keys(breakdown).map(cat => `
+                <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                    <p class="text-[9px] text-slate-500 uppercase">${cat}</p>
+                    <p class="text-xs font-bold">${currencySymbol}${breakdown[cat].toFixed(2)}</p>
+                </div>
+            `).join('');
 
             if(percentUsed >= 90) {
                 progressBar.className = "progress-transition bg-rose-500 h-full rounded-full shadow-lg shadow-rose-500/40";
@@ -641,7 +640,7 @@
             const legendContainer = document.getElementById('chart-legend');
             if (monthlyBurn === 0) {
                 barContainer.innerHTML = `<div class="w-full bg-slate-900 rounded-full"></div>`;
-                legendContainer.innerHTML = `<span class="text-slate-500 italic">No spending tracking metrics compiled yet</span>`;
+                legendContainer.innerHTML = `<span class="text-slate-500 italic">No tracking assets built out yet</span>`;
                 return;
             }
 
@@ -663,110 +662,129 @@
         }
 
         function updateFinancialAdvice(totalBurn, breakdown) {
+            const currentCapLocalized = budgetCapUSD * currencyRates[currencySymbol];
             if (totalBurn === 0) {
-                financialAdviceEl.innerText = "No subscription costs calculated yet. Add assets to trigger custom tracking updates.";
+                financialAdviceEl.innerText = "No active items checked. Initialize structural entries to trigger analysis arrays logs.";
                 return;
             }
-            let highestCategory = 'Entertainment'; let maxSpending = 0;
-            Object.keys(breakdown).forEach(cat => { if (breakdown[cat] > maxSpending) { maxSpending = breakdown[cat]; highestCategory = cat; } });
 
-            const targetCapLocalized = budgetCapUSD * currencyRates[currencySymbol];
-            if(totalBurn > targetCapLocalized) {
-                financialAdviceEl.innerHTML = `🚨 <span class="text-rose-400 font-bold">Budget breached!</span> You are over your limits by ${currencySymbol}${(totalBurn - targetCapLocalized).toFixed(2)}. Trim items down immediately.`;
-            } else if (totalBurn > targetCapLocalized * 0.75) {
-                financialAdviceEl.innerHTML = `⚠️ Approaching your safe ceiling maximums. <span class="text-amber-400 font-bold">${categoryMeta[highestCategory].label}</span> is draining capital reserves heavily. Exercise caution.`;
+            let highestCat = 'Other';
+            let maxSpend = 0;
+            Object.keys(breakdown).forEach(cat => {
+                if (breakdown[cat] > maxSpend) {
+                    maxSpend = breakdown[cat];
+                    highestCat = cat;
+                }
+            });
+
+            if (totalBurn > currentCapLocalized) {
+                financialAdviceEl.innerText = `Critical limit reached! You are outspending your custom budget cap limit by ${currencySymbol}${(totalBurn - currentCapLocalized).toFixed(2)}. Consider offloading items under "${highestCat}".`;
+            } else if (totalBurn > currentCapLocalized * 0.8) {
+                financialAdviceEl.innerText = `Warning threshold triggered. Subscriptions eat up over 80% of your current caps. Keep close tabs on upcoming renewal intervals.`;
             } else {
-                financialAdviceEl.innerHTML = `✨ Portfolio healthy. Your top budget focus rests in <span class="text-indigo-400 font-bold">${categoryMeta[highestCategory].label}</span>. Maintain current oversight parameters.`;
+                financialAdviceEl.innerText = `Your profile looks balanced. "${highestCat}" accounts for your largest share (${currencySymbol}${maxSpend.toFixed(2)}/mo). You have safe margins below limitations.`;
             }
-        }
-
-        function animateValue(element, targetValue, isCurrency) {
-            let startTimestamp = null; const duration = 400; 
-            const startValue = parseFloat(element.innerText.replace(/[^0-9.]/g, '')) || 0;
-            function step(timestamp) {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const currentValue = startValue + progress * (targetValue - startValue);
-                element.innerText = isCurrency ? `${currencySymbol}${currentValue.toFixed(2)}` : Math.floor(currentValue);
-                if (progress < 1) window.requestAnimationFrame(step);
-                else element.innerText = isCurrency ? `${currencySymbol}${targetValue.toFixed(2)}` : targetValue;
-            }
-            window.requestAnimationFrame(step);
         }
 
         function filterAndRender() {
-            if (document.getElementById("dashboard-view").classList.contains("hidden")) return;
+            const searchVal = document.getElementById('search-bar').value.toLowerCase();
+            const categoryVal = document.getElementById('filter-category').value;
+            const sortVal = document.getElementById('filter-sort').value;
 
-            const searchQuery = document.getElementById('search-bar').value.toLowerCase().trim();
-            const selectedCategory = document.getElementById('filter-category').value;
-            const activeSort = document.getElementById('filter-sort').value;
-
-            let filteredSubs = subscriptions.filter(sub => {
-                const matchesSearch = sub.name.toLowerCase().includes(searchQuery);
-                const matchesCategory = selectedCategory === 'all' || sub.category === selectedCategory;
-                
-                const parsedDate = new Date(sub.date + 'T00:00:00');
-                const today = new Date(); today.setHours(0,0,0,0);
-                const daysUntil = Math.ceil((parsedDate - today) / (1000 * 60 * 60 * 24));
-                
-                let matchesQuickFilter = true;
-                if(activeQuickFilter === 'soon') matchesQuickFilter = (daysUntil >= 0 && daysUntil <= 3);
-                if(activeQuickFilter === 'overdue') matchesQuickFilter = (daysUntil < 0);
-
-                return matchesSearch && matchesCategory && matchesQuickFilter;
+            let maxCost = 0;
+            subscriptions.forEach(s => {
+                const cost = getConvertedCost(s);
+                if(cost > maxCost) maxCost = cost;
             });
 
-            if (activeSort === 'date') filteredSubs.sort((a, b) => new Date(a.date) - new Date(b.date));
-            else if (activeSort === 'cost-desc') filteredSubs.sort((a, b) => getConvertedCost(b) - getConvertedCost(a));
-            else if (activeSort === 'cost-asc') filteredSubs.sort((a, b) => getConvertedCost(a) - getConvertedCost(b));
-            else if (activeSort === 'name') filteredSubs.sort((a, b) => a.name.localeCompare(b.name));
+            let filtered = subscriptions.map((sub, index) => ({ ...sub, originalIndex: index }));
 
-            listCountEl.innerText = `${filteredSubs.length} Items`;
-            renderList(filteredSubs);
-        }
+            if (searchVal) {
+                filtered = filtered.filter(sub => sub.name.toLowerCase().includes(searchVal));
+            }
 
-        function renderList(targetArray) {
-            if (targetArray.length === 0) { subsContainer.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
+            if (categoryVal !== 'all') {
+                filtered = filtered.filter(sub => sub.category === categoryVal);
+            }
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            if (activeQuickFilter === 'soon') {
+                filtered = filtered.filter(sub => {
+                    const renDate = new Date(sub.date);
+                    const diffDays = Math.ceil((renDate - today) / (1000 * 60 * 60 * 24));
+                    return diffDays >= 0 && diffDays <= 7;
+                });
+            } else if (activeQuickFilter === 'overdue') {
+                filtered = filtered.filter(sub => new Date(sub.date) < today);
+            }
+
+            filtered.sort((a, b) => {
+                if (sortVal === 'cost-desc') return getConvertedCost(b) - getConvertedCost(a);
+                if (sortVal === 'cost-asc') return getConvertedCost(a) - getConvertedCost(b);
+                if (sortVal === 'name') return a.name.localeCompare(b.name);
+                return new Date(a.date) - new Date(b.date);
+            });
+
+            listCountEl.innerText = `${filtered.length} Active`;
+
+            if (filtered.length === 0) {
+                subsContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
             emptyState.classList.add('hidden');
 
-            subsContainer.innerHTML = targetArray.map((sub, index) => {
-                const costFormatted = getConvertedCost(sub).toFixed(2);
-                const parsedDate = new Date(sub.date + 'T00:00:00');
-                const displayDate = parsedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                const today = new Date(); today.setHours(0,0,0,0);
-                const daysUntil = Math.ceil((parsedDate - today) / (1000 * 60 * 60 * 24));
-                
-                let criticalTagHtml = '';
-                if (daysUntil >= 0 && daysUntil <= 3) criticalTagHtml = `<span class="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider animate-pulse">Renewing Soon</span>`;
-                else if (daysUntil < 0) criticalTagHtml = `<span class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Overdue</span>`;
-
+            subsContainer.innerHTML = filtered.map(sub => {
+                const convertedCost = getConvertedCost(sub);
                 const meta = categoryMeta[sub.category] || categoryMeta['Other'];
+                const isTopSpender = (convertedCost === maxCost && maxCost > 0);
+                
+                const renDate = new Date(sub.date);
+                const diffDays = Math.ceil((renDate - today) / (1000 * 60 * 60 * 24));
+                
+                let timelineBadge = '';
+                if (diffDays < 0) {
+                    timelineBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1"><i data-lucide='alert-circle' class='w-3 h-3'></i> Overdue (${Math.abs(diffDays)}d)</span>`;
+                } else if (diffDays <= 3) {
+                    timelineBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1"><i data-lucide='clock' class='w-3 h-3'></i> In ${diffDays} days</span>`;
+                } else {
+                    timelineBadge = `<span class="bg-slate-900 text-slate-400 border border-slate-800 text-[10px] px-2 py-0.5 rounded-md font-medium">In ${diffDays} days</span>`;
+                }
 
                 return `
-                    <div class="bg-slate-900/40 border border-slate-900/80 hover:border-slate-800 hover:bg-slate-900/70 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-300 group hover:scale-[1.01] hover:shadow-xl hover:shadow-slate-950/20 animate-render" style="animation-delay: ${index * 0.04}s">
-                        <div class="flex items-start gap-3.5 w-full sm:w-auto">
-                            <div class="bg-slate-950 border border-slate-800 group-hover:border-indigo-500/40 h-12 w-12 rounded-xl flex items-center justify-center font-black text-xl text-indigo-400 shrink-0 transition-colors duration-300 shadow-inner">
+                    <div class="bg-slate-900/30 border ${isTopSpender ? 'border-amber-500/50' : 'border-slate-800'} hover:border-slate-700/80 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-300 shadow-md group animate-render">
+                        <div class="flex items-center gap-3.5">
+                            <div class="${meta.color} text-white w-11 h-11 rounded-xl flex items-center justify-center font-black tracking-tighter text-sm shadow-md shadow-indigo-950/40 transform group-hover:scale-105 transition-transform relative">
                                 ${sub.name.charAt(0).toUpperCase()}
+                                ${isTopSpender ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-slate-900"></span>' : ''}
                             </div>
-                            <div class="truncate">
+                            <div>
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <h4 class="font-bold text-slate-200 group-hover:text-white transition-colors duration-300 truncate max-w-[160px] tracking-tight">${sub.name}</h4>
-                                    <span class="text-[10px] font-bold ${meta.text} bg-slate-950 border ${meta.border} px-2.5 py-0.5 rounded-full uppercase tracking-wider">${meta.label}</span>
-                                    ${criticalTagHtml}
+                                    <h4 class="font-bold text-slate-100 group-hover:text-indigo-400 transition-colors">${sub.name} ${isTopSpender ? '<span class="text-[9px] bg-amber-500 text-slate-950 px-1.5 rounded font-black uppercase ml-1">Top</span>' : ''}</h4>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-400 font-semibold tracking-wide">${meta.label}</span>
                                 </div>
-                                <p class="text-xs text-slate-400 mt-1.5 flex items-center gap-1.5 font-medium">
-                                    <i data-lucide="bell" class="w-3.5 h-3.5 text-slate-500"></i> Next Invoice: <span class="text-slate-300 font-semibold">${displayDate}</span>
+                                <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                                    <i data-lucide="calendar" class="w-3 h-3"></i> Renewal: ${sub.date}
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t border-slate-900 sm:border-0 pt-3 sm:pt-0">
+                        
+                        <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-800/60">
                             <div class="text-left sm:text-right">
-                                <span class="text-xl font-black text-slate-100 group-hover:text-indigo-400 transition-colors duration-300">${currencySymbol}${costFormatted}</span>
-                                <span class="text-[10px] font-bold text-slate-500 block uppercase tracking-widest">${sub.cycle === 'monthly' ? 'per month' : 'per year'}</span>
+                                <p class="text-base font-black text-slate-200">${currencySymbol}${convertedCost.toFixed(2)}</p>
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mt-0.5">${sub.cycle}</p>
                             </div>
-                            <button type="button" onclick="deleteSubscription('${sub.id}')" class="text-slate-500 hover:text-rose-400 p-2.5 rounded-xl hover:bg-rose-500/10 transition-all duration-200 active:scale-90">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                ${timelineBadge}
+                                <button onclick="editSubscription(${sub.originalIndex})" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-500 hover:text-indigo-400 rounded-xl transition-all active:scale-90" title="Edit Element">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteSubscription(${sub.originalIndex})" class="p-2 bg-slate-950 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-900/50 text-slate-500 hover:text-rose-400 rounded-xl transition-all active:scale-90" title="Delete Element">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -776,46 +794,111 @@
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const newSubscription = {
-                id: 'sub_' + Date.now(),
-                name: document.getElementById('sub-name').value,
-                cost: document.getElementById('sub-cost').value,
+            const editIndex = parseInt(document.getElementById('edit-index').value);
+            
+            const sub = {
+                name: document.getElementById('sub-name').value.trim(),
+                cost: parseFloat(document.getElementById('sub-cost').value),
                 cycle: document.getElementById('sub-cycle').value,
                 category: document.getElementById('sub-category').value,
                 date: document.getElementById('sub-date').value,
-                currency: currencySymbol
+                currency: currencySymbol 
             };
-            subscriptions.push(newSubscription);
+
+            if (editIndex > -1) {
+                subscriptions[editIndex] = sub;
+                document.getElementById('edit-index').value = -1;
+                document.getElementById('form-heading').innerText = "Track New Asset";
+                document.getElementById('submit-btn').innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Add Tracked Item';
+            } else {
+                subscriptions.push(sub);
+            }
+
             saveData();
             form.reset();
             document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
         });
 
-        window.deleteSubscription = function(id) { subscriptions = subscriptions.filter(sub => sub.id !== id); saveData(); };
-        function clearAllData() { if (confirm("Are you absolutely sure you want to clear your local database? This operation cannot be undone.")) { subscriptions = []; saveData(); } }
+        function deleteSubscription(index) {
+            subscriptions.splice(index, 1);
+            saveData();
+        }
+
+        function clearAllData() {
+            if(confirm('Are you absolutely sure you want to completely purge your saved metrics profiles?')) {
+                subscriptions = [];
+                saveData();
+            }
+        }
 
         function exportData() {
-            if(subscriptions.length === 0) { alert("There is no subscription data to export yet!"); return; }
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(subscriptions));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(subscriptions, null, 2));
             const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", `subspace_pro_backup_${new Date().toISOString().split('T')[0]}.json`);
-            document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove();
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `subspace_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
 
         function importData(event) {
-            const fileReader = new FileReader();
-            fileReader.onload = function(e) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
                 try {
-                    const parsedData = JSON.parse(e.target.result);
-                    if (Array.isArray(parsedData)) { subscriptions = parsedData; saveData(); }
-                    else { alert("Invalid backup format architecture."); }
-                } catch (err) { alert("Error processing backup source file."); }
+                    const parsed = JSON.parse(e.target.result);
+                    if(Array.isArray(parsed)) {
+                        subscriptions = parsed;
+                        saveData();
+                        alert('Metrics backup profiles loaded successfully!');
+                    } else {
+                        alert('Error: Data structures validation failed.');
+                    }
+                } catch(err) {
+                    alert('Failure processing data payload definitions.');
+                }
             };
-            if(event.target.files[0]) fileReader.readAsText(event.target.files[0]);
+            reader.readAsText(file);
         }
 
+        function animateValue(obj, end, isCurrency) {
+            let start = parseFloat(obj.innerText.replace(/[^\d.]/g, '')) || 0;
+            if (start === end) {
+                obj.innerText = isCurrency ? `${currencySymbol}${end.toFixed(2)}` : end;
+                return;
+            }
+            const duration = 400; 
+            const startTimestamp = performance.now();
+            
+            function step(timestamp) {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = progress * (end - start) + start;
+                obj.innerText = isCurrency ? `${currencySymbol}${current.toFixed(2)}` : Math.floor(current);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerText = isCurrency ? `${currencySymbol}${end.toFixed(2)}` : end;
+                }
+            }
+            window.requestAnimationFrame(step);
+        }
+
+        // --- AUTH OBSERVER PERSISTENCE ENGINE ---
         window.addEventListener('DOMContentLoaded', () => {
-            initApp();
+            lucide.createIcons();
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    document.getElementById("landing-view").classList.add("hidden");
+                    document.getElementById("auth-view").classList.add("hidden");
+                    document.getElementById("dashboard-view").classList.remove("hidden");
+                    initDashboardEngine(user.email);
+                } else {
+                    navigateToLanding();
+                }
+            });
         });
     </script>
 </body>
