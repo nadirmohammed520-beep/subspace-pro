@@ -18,7 +18,7 @@
         
         @keyframes pulseGlow {
             0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.45; }
+            50% { opacity: 0.45; }\
         }
         .glow-effect { animation: pulseGlow 3s ease-in-out infinite; }
         .progress-transition { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; }
@@ -486,7 +486,7 @@
                 authMode = "signup";
                 subtitle.innerText = "Provision an absolute premium deployment environment profile";
                 userField.classList.remove("hidden");
-                confirmPasswordField.classList.remove("hidden"); // Show confirm password field
+                confirmPasswordField.classList.remove("hidden"); 
                 document.getElementById("auth-username").required = true;
                 document.getElementById("auth-confirm-password").required = true;
                 submitBtn.innerHTML = `<span>Provision Account</span> <i data-lucide="user-plus" class="w-4 h-4"></i>`;
@@ -496,7 +496,7 @@
                 authMode = "signin";
                 subtitle.innerText = "Secure multi-platform premium subscription architecture";
                 userField.classList.add("hidden");
-                confirmPasswordField.classList.add("hidden"); // Hide confirm password field
+                confirmPasswordField.classList.add("hidden"); 
                 document.getElementById("auth-username").required = false;
                 document.getElementById("auth-confirm-password").required = false;
                 submitBtn.innerHTML = `<span>Access Dashboard</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
@@ -514,7 +514,6 @@
             const password = document.getElementById("auth-password").value;
             const submitBtn = document.getElementById("auth-submit-btn");
 
-            // Validate that passwords match when signing up
             if (authMode === "signup") {
                 const confirmPassword = document.getElementById("auth-confirm-password").value;
                 if (password !== confirmPassword) {
@@ -595,7 +594,7 @@
                     document.getElementById('user-display-tag').innerText = data.username || user.displayName || user.email.split('@')[0];
                     subscriptions = data.userRecords || [];
                     currencySymbol = data.currencySymbol || '$';
-                    budgetCapUSD = data.budgetCapUSD || 200;
+                    budgetCapUSD = data.budgetCapUSD !== undefined ? data.budgetCapUSD : 200;
                 } else {
                     subscriptions = [];
                     currencySymbol = '$';
@@ -985,7 +984,10 @@
                 document.getElementById("dashboard-view").classList.remove("hidden");
                 window.initDashboardEngine(user);
             } else {
+                currentUserSession = null;
+                subscriptions = [];
                 document.getElementById("dashboard-view").classList.add("hidden");
+                document.getElementById("auth-view").classList.add("hidden");
                 document.getElementById("landing-view").classList.remove("hidden");
             }
         });
