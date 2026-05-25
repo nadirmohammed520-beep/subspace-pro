@@ -568,12 +568,15 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    document.getElementById('user-display-tag').innerText = data.username;
+                    document.getElementById('user-display-tag').innerText = data.username || user.displayName || user.email.split('@')[0];
                     subscriptions = data.userRecords || [];
                     currencySymbol = data.currencySymbol || '$';
                     budgetCapUSD = data.budgetCapUSD || 200;
                 } else {
                     subscriptions = [];
+                    currencySymbol = '$';
+                    budgetCapUSD = 200;
+                    document.getElementById('user-display-tag').innerText = user.displayName || user.email.split('@')[0];
                 }
 
                 document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
@@ -591,19 +594,22 @@
 
         window.saveData = async function() {
             if (!currentUserSession) return;
+            
+            // Render locally FIRST (Optimistic UI) so elements add and switch instantly
+            window.updateFormCurrencyLabel();
+            window.updateMetricsAndCharts();
+            window.filterAndRender();
+            
             try {
                 const docRef = doc(db, "users", currentUserSession);
-                await updateDoc(docRef, {
+                // Safe setDoc with merge: true guarantees it works even if user entry didn't exist yet
+                await setDoc(docRef, {
                     userRecords: subscriptions,
                     currencySymbol: currencySymbol,
                     budgetCapUSD: budgetCapUSD
-                });
-                
-                window.updateFormCurrencyLabel();
-                window.updateMetricsAndCharts();
-                window.filterAndRender();
+                }, { merge: true });
             } catch(e) {
-                console.log("Error syncing to cloud:", e);
+                console.error("Error syncing to cloud:", e);
             }
         };
 
@@ -950,7 +956,6 @@
         };
 
         // --- AUTH LISTENER LOGIC ---
-        // This watches Firebase continuously. If you log in, it switches to the dashboard.
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById("landing-view").classList.add("hidden");
