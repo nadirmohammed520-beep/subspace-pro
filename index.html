@@ -18,7 +18,7 @@
         
         @keyframes pulseGlow {
             0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.45; }\
+            50% { opacity: 0.45; }
         }
         .glow-effect { animation: pulseGlow 3s ease-in-out infinite; }
         .progress-transition { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; }
@@ -196,7 +196,7 @@
         </header>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10 w-full flex-1">
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl group hover:border-rose-500/30 transition-all duration-300 backdrop-blur-sm">
                     <div>
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Monthly Burn Rate</p>
@@ -237,6 +237,24 @@
                     </div>
                     <div class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 group-hover:scale-110 transition-transform duration-300">
                         <i data-lucide="layers" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl group hover:border-cyan-500/30 transition-all duration-300 backdrop-blur-sm">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Average Asset Cost</p>
+                        <h3 id="average-cost" class="text-2xl font-extrabold mt-1 text-slate-100 transition-all duration-300 group-hover:text-cyan-400">$0.00</h3>
+                    </div>
+                    <div class="bg-cyan-500/10 p-3 rounded-xl text-cyan-400 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="calculator" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-xl group hover:border-purple-500/30 transition-all duration-300 backdrop-blur-sm">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Paused Vault Saved</p>
+                        <h3 id="paused-total" class="text-2xl font-extrabold mt-1 text-slate-100 transition-all duration-300 group-hover:text-purple-400">$0.00</h3>
+                    </div>
+                    <div class="bg-purple-500/10 p-3 rounded-xl text-purple-400 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="pause-circle" class="w-5 h-5"></i>
                     </div>
                 </div>
             </section>
@@ -290,6 +308,12 @@
                             <button onclick="window.applyPreset('iCloud Plus', 2.99, 'Utilities')" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-left p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all text-xs font-semibold text-slate-300">
                                 <span class="text-cyan-400 font-black">I</span> iCloud+ ($2.99)
                             </button>
+                            <button onclick="window.applyPreset('ChatGPT Plus', 20.00, 'Work & Software')" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-left p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all text-xs font-semibold text-slate-300">
+                                <span class="text-teal-500 font-black">C</span> ChatGPT ($20)
+                            </button>
+                            <button onclick="window.applyPreset('Gym Membersip', 45.00, 'Health & Fitness')" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-left p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all text-xs font-semibold text-slate-300">
+                                <span class="text-emerald-400 font-black">G</span> Gym ($45)
+                            </button>
                         </div>
                     </div>
 
@@ -321,21 +345,62 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Category Grouping</label>
-                                <select id="sub-category" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
-                                    <option value="Entertainment">🍿 Entertainment</option>
-                                    <option value="Work & Software">💻 Work & Software</option>
-                                    <option value="Utilities">⚡ Utilities</option>
-                                    <option value="Health & Fitness">💪 Health & Fitness</option>
-                                    <option value="Other">📦 Other</option>
-                                </select>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Category Grouping</label>
+                                    <select id="sub-category" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
+                                        <option value="Entertainment">🍿 Entertainment</option>
+                                        <option value="Work & Software">💻 Work & Software</option>
+                                        <option value="Utilities">⚡ Utilities</option>
+                                        <option value="Health & Fitness">💪 Health & Fitness</option>
+                                        <option value="Other">📦 Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Payment Method</label>
+                                    <select id="sub-payment" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
+                                        <option value="Credit Card">💳 Credit Card</option>
+                                        <option value="Debit Card">🪙 Debit Card</option>
+                                        <option value="PayPal">🅿️ PayPal</option>
+                                        <option value="Apple Pay">🍏 Apple Pay</option>
+                                        <option value="Google Pay">🤖 Google Pay</option>
+                                        <option value="Bank Transfer">🏦 Bank Transfer</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Started On (LTV Calc)</label>
+                                    <input type="date" id="sub-start-date"
+                                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Portal Quick-Link</label>
+                                    <input type="url" id="sub-url" placeholder="https://..." 
+                                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 shadow-inner text-sm">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Next Billing Date</label>
+                                    <input type="date" id="sub-date" required
+                                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Asset Pipeline Status</label>
+                                    <select id="sub-status" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
+                                        <option value="active">🟢 Active</option>
+                                        <option value="paused">🟡 Paused</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div>
-                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Next Billing Date</label>
-                                <input type="date" id="sub-date" required
-                                    class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 cursor-pointer text-sm">
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Custom Notes / Metadata</label>
+                                <input type="text" id="sub-notes" placeholder="e.g. Shared with family, cancels in winter" 
+                                    class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 focus:outline-none transition-all duration-200 shadow-inner text-sm">
                             </div>
 
                             <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-indigo-600/10 active:scale-[0.99] flex items-center justify-center gap-2 mt-4 text-sm">
@@ -358,6 +423,7 @@
                                 <button onclick="window.toggleQuickFilter('all')" id="qf-all" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-slate-900 text-indigo-400 transition-all">All</button>
                                 <button onclick="window.toggleQuickFilter('soon')" id="qf-soon" class="text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Soon</button>
                                 <button onclick="window.toggleQuickFilter('overdue')" id="qf-overdue" class="text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Overdue</button>
+                                <button onclick="window.toggleQuickFilter('paused')" id="qf-paused" class="text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Paused</button>
                             </div>
 
                             <select id="filter-category" onchange="window.filterAndRender()" class="w-full sm:w-auto text-xs font-semibold bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer">
@@ -374,6 +440,9 @@
                                 <option value="cost-desc">Sort by: Price (High-Low)</option>
                                 <option value="cost-asc">Sort by: Price (Low-High)</option>
                                 <option value="name">Sort by: Alphabetical</option>
+                                <option value="payment">Sort by: Payment Method</option>
+                                <option value="status">Sort by: Status</option>
+                                <option value="ltv">Sort by: Lifetime Spend</option>
                             </select>
                         </div>
                     </div>
@@ -442,6 +511,8 @@
         const monthlyTotalEl = document.getElementById('monthly-total');
         const yearlyTotalEl = document.getElementById('yearly-total');
         const activeCountEl = document.getElementById('active-count');
+        const averageCostEl = document.getElementById('average-cost');
+        const pausedTotalEl = document.getElementById('paused-total');
         const listCountEl = document.getElementById('list-count');
         const financialAdviceEl = document.getElementById('financial-advice');
 
@@ -603,6 +674,7 @@
                 }
 
                 document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('sub-start-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('global-currency').value = currencySymbol;
                 document.getElementById('budget-limit-input').value = (budgetCapUSD * currencyRates[currencySymbol]).toFixed(0);
                 
@@ -642,10 +714,48 @@
             document.getElementById('sub-cycle').value = sub.cycle;
             document.getElementById('sub-category').value = sub.category;
             document.getElementById('sub-date').value = sub.date;
+            
+            document.getElementById('sub-start-date').value = sub.startDate || '';
+            document.getElementById('sub-url').value = sub.url || '';
+            document.getElementById('sub-payment').value = sub.payment || 'Credit Card';
+            document.getElementById('sub-status').value = sub.status || 'active';
+            document.getElementById('sub-notes').value = sub.notes || '';
+            
             document.getElementById('edit-index').value = index;
             document.getElementById('form-heading').innerText = "Edit Asset";
             document.getElementById('submit-btn').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Save Changes';
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.markAsPaid = function(index) {
+            const sub = subscriptions[index];
+            if (!sub || !sub.date) return;
+            
+            const parts = sub.date.split('-');
+            if (parts.length !== 3) return;
+            
+            let year = parseInt(parts[0], 10);
+            let month = parseInt(parts[1], 10) - 1; 
+            let day = parseInt(parts[2], 10);
+            
+            let d = new Date(year, month, day);
+            if (sub.cycle === 'monthly') d.setMonth(d.getMonth() + 1);
+            else if (sub.cycle === 'yearly') d.setFullYear(d.getFullYear() + 1);
+            
+            const newYear = d.getFullYear();
+            const newMonth = String(d.getMonth() + 1).padStart(2, '0');
+            const newDay = String(d.getDate()).padStart(2, '0');
+            
+            sub.date = `${newYear}-${newMonth}-${newDay}`;
+            window.saveData();
+        };
+
+        window.duplicateSubscription = function(index) {
+            const sub = { ...subscriptions[index] };
+            sub.name = sub.name + ' (Copy)';
+            // Give it a fresh unique id conceptually by pushing it to the end
+            subscriptions.push(sub);
+            window.saveData();
         };
 
         window.changeCurrency = function(symbol) {
@@ -669,6 +779,13 @@
             document.getElementById('sub-name').value = name;
             document.getElementById('sub-cost').value = scaledCost.toFixed(2);
             document.getElementById('sub-category').value = category;
+            
+            // Re-initialize clean fields
+            document.getElementById('sub-start-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('sub-url').value = '';
+            document.getElementById('sub-payment').value = 'Credit Card';
+            document.getElementById('sub-status').value = 'active';
+            document.getElementById('sub-notes').value = '';
             document.getElementById('edit-index').value = -1;
             document.getElementById('form-heading').innerText = "Track New Asset";
             document.getElementById('submit-btn').innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Add Tracked Item';
@@ -676,7 +793,7 @@
 
         window.toggleQuickFilter = function(type) {
             activeQuickFilter = type;
-            ['all', 'soon', 'overdue'].forEach(f => {
+            ['all', 'soon', 'overdue', 'paused'].forEach(f => {
                 const btn = document.getElementById(`qf-${f}`);
                 if (f === type) {
                     btn.classList.add('bg-slate-900', 'text-indigo-400');
@@ -689,6 +806,12 @@
             window.filterAndRender();
         };
 
+        window.toggleSubscriptionStatus = function(index) {
+            const currentStatus = subscriptions[index].status || 'active';
+            subscriptions[index].status = currentStatus === 'active' ? 'paused' : 'active';
+            window.saveData();
+        };
+
         window.getConvertedCost = function(sub) {
             const originalCost = parseFloat(sub.cost) || 0;
             const originalCurrency = sub.currency || "$";
@@ -696,21 +819,54 @@
             return (originalCost / currencyRates[originalCurrency]) * currencyRates[currencySymbol];
         };
 
+        // Standardized LTV calc to be accessible by the sorting function
+        window.getLifetimeValue = function(sub) {
+            if (!sub.startDate) return 0;
+            const start = new Date(sub.startDate);
+            const today = new Date();
+            const convertedCost = window.getConvertedCost(sub);
+            let lifetimeSpend = 0;
+
+            if (start <= today) {
+                const monthsDiff = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
+                if (sub.cycle === 'monthly') {
+                    lifetimeSpend = Math.max(1, monthsDiff + 1) * convertedCost; // Including the current month
+                } else {
+                    const yearsDiff = today.getFullYear() - start.getFullYear();
+                    lifetimeSpend = Math.max(1, yearsDiff + 1) * convertedCost;
+                }
+            }
+            return lifetimeSpend;
+        };
+
         window.updateMetricsAndCharts = function() {
             let monthlyBurn = 0;
+            let pausedBurn = 0;
+            let activeCount = 0;
             let breakdown = { 'Entertainment': 0, 'Work & Software': 0, 'Utilities': 0, 'Health & Fitness': 0, 'Other': 0 };
 
             subscriptions.forEach(sub => {
                 const convertedCost = window.getConvertedCost(sub);
                 let normalizedMonthly = sub.cycle === 'monthly' ? convertedCost : (convertedCost / 12);
-                monthlyBurn += normalizedMonthly;
-                if (breakdown[sub.category] !== undefined) breakdown[sub.category] += normalizedMonthly;
-                else breakdown['Other'] += normalizedMonthly;
+                
+                const status = sub.status || 'active';
+                if (status === 'active') {
+                    monthlyBurn += normalizedMonthly;
+                    activeCount++;
+                    if (breakdown[sub.category] !== undefined) breakdown[sub.category] += normalizedMonthly;
+                    else breakdown['Other'] += normalizedMonthly;
+                } else {
+                    pausedBurn += normalizedMonthly;
+                }
             });
+
+            let averageCost = activeCount > 0 ? (monthlyBurn / activeCount) : 0;
 
             window.animateValue(monthlyTotalEl, monthlyBurn, true);
             window.animateValue(yearlyTotalEl, monthlyBurn * 12, true);
-            window.animateValue(activeCountEl, subscriptions.length, false);
+            window.animateValue(activeCountEl, activeCount, false);
+            window.animateValue(averageCostEl, averageCost, true);
+            window.animateValue(pausedTotalEl, pausedBurn, true);
 
             const currentCapLocalized = budgetCapUSD * currencyRates[currencySymbol];
             let percentUsed = currentCapLocalized > 0 ? Math.min((monthlyBurn / currentCapLocalized) * 100, 100) : 0;
@@ -745,7 +901,7 @@
             const legendContainer = document.getElementById('chart-legend');
             if (monthlyBurn === 0) {
                 barContainer.innerHTML = `<div class="w-full bg-slate-900 rounded-full"></div>`;
-                legendContainer.innerHTML = `<span class="text-slate-500 italic">No tracking assets built out yet</span>`;
+                legendContainer.innerHTML = `<span class="text-slate-500 italic">No active deployment profiles analytics found</span>`;
                 return;
             }
 
@@ -799,26 +955,31 @@
 
             let filtered = subscriptions.map((sub, index) => ({ ...sub, originalIndex: index }));
 
-            if (searchVal) filtered = filtered.filter(sub => sub.name.toLowerCase().includes(searchVal));
+            if (searchVal) filtered = filtered.filter(sub => sub.name.toLowerCase().includes(searchVal) || (sub.notes && sub.notes.toLowerCase().includes(searchVal)));
             if (categoryVal !== 'all') filtered = filtered.filter(sub => sub.category === categoryVal);
 
             const today = new Date();
             today.setHours(0,0,0,0);
             
             if (activeQuickFilter === 'soon') {
-                filtered = filtered.filter(sub => {
+                filtered = filtered.filter(sub => (sub.status || 'active') === 'active').filter(sub => {
                     const renDate = new Date(sub.date);
                     const diffDays = Math.ceil((renDate - today) / (1000 * 60 * 60 * 24));
                     return diffDays >= 0 && diffDays <= 7;
                 });
             } else if (activeQuickFilter === 'overdue') {
-                filtered = filtered.filter(sub => new Date(sub.date) < today);
+                filtered = filtered.filter(sub => (sub.status || 'active') === 'active').filter(sub => new Date(sub.date) < today);
+            } else if (activeQuickFilter === 'paused') {
+                filtered = filtered.filter(sub => (sub.status || 'active') === 'paused');
             }
 
             filtered.sort((a, b) => {
                 if (sortVal === 'cost-desc') return window.getConvertedCost(b) - window.getConvertedCost(a);
                 if (sortVal === 'cost-asc') return window.getConvertedCost(a) - window.getConvertedCost(b);
                 if (sortVal === 'name') return a.name.localeCompare(b.name);
+                if (sortVal === 'payment') return (a.payment || '').localeCompare(b.payment || '');
+                if (sortVal === 'status') return (a.status || 'active').localeCompare(b.status || 'active');
+                if (sortVal === 'ltv') return window.getLifetimeValue(b) - window.getLifetimeValue(a);
                 return new Date(a.date) - new Date(b.date);
             });
 
@@ -839,23 +1000,39 @@
                 const renDate = new Date(sub.date);
                 const diffDays = Math.ceil((renDate - today) / (1000 * 60 * 60 * 24));
                 
+                const status = sub.status || 'active';
+                const isPaused = status === 'paused';
+                const lifetimeVal = window.getLifetimeValue(sub);
+                
                 let timelineBadge = '';
-                if (diffDays < 0) timelineBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1"><i data-lucide='alert-circle' class='w-3 h-3'></i> Overdue (${Math.abs(diffDays)}d)</span>`;
-                else if (diffDays <= 3) timelineBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1"><i data-lucide='clock' class='w-3 h-3'></i> In ${diffDays} days</span>`;
-                else timelineBadge = `<span class="bg-slate-900 text-slate-400 border border-slate-800 text-[10px] px-2 py-0.5 rounded-md font-medium">In ${diffDays} days</span>`;
+                if (isPaused) {
+                    timelineBadge = `<span class="bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1"><i data-lucide='pause' class='w-3 h-3'></i> Paused Vault</span>`;
+                } else if (diffDays < 0) {
+                    timelineBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1"><i data-lucide='alert-circle' class='w-3 h-3'></i> Overdue (${Math.abs(diffDays)}d)</span>`;
+                } else if (diffDays <= 3) {
+                    timelineBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1"><i data-lucide='clock' class='w-3 h-3'></i> In ${diffDays} days</span>`;
+                } else {
+                    timelineBadge = `<span class="bg-slate-900 text-slate-400 border border-slate-800 text-[10px] px-2 py-0.5 rounded-md font-medium">In ${diffDays} days</span>`;
+                }
 
                 return `
-                    <div class="bg-slate-900/30 border ${isTopSpender ? 'border-amber-500/50' : 'border-slate-800'} hover:border-slate-700/80 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-300 shadow-md group animate-render">
+                    <div class="bg-slate-900/30 border ${isTopSpender ? 'border-amber-500/50' : 'border-slate-800'} ${isPaused ? 'opacity-55' : ''} hover:border-slate-700/80 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-300 shadow-md group animate-render">
                         <div class="flex items-center gap-3.5">
-                            <div class="${meta.color} text-white w-11 h-11 rounded-xl flex items-center justify-center font-black tracking-tighter text-sm shadow-md shadow-indigo-950/40 transform group-hover:scale-105 transition-transform relative">
+                            <div class="${meta.color} text-white w-11 h-11 rounded-xl flex items-center justify-center font-black tracking-tighter text-sm shadow-md shadow-indigo-950/40 transform group-hover:scale-105 transition-transform relative shrink-0">
                                 ${sub.name.charAt(0).toUpperCase()}
                                 ${isTopSpender ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-slate-900"></span>' : ''}
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <h4 class="font-bold text-slate-100 group-hover:text-indigo-400 transition-colors">${sub.name} ${isTopSpender ? '<span class="text-[9px] bg-amber-500 text-slate-950 px-1.5 rounded font-black uppercase ml-1">Top</span>' : ''}</h4>
+                                    <h4 class="font-bold text-slate-100 group-hover:text-indigo-400 transition-colors flex items-center gap-1.5">
+                                        ${sub.name} 
+                                        ${sub.url ? `<a href="${sub.url}" target="_blank" class="text-slate-500 hover:text-indigo-400 transition-colors" title="Open Portal"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>` : ''}
+                                        ${isTopSpender ? '<span class="text-[9px] bg-amber-500 text-slate-950 px-1.5 rounded font-black uppercase ml-1">Top</span>' : ''}
+                                    </h4>
                                     <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-400 font-semibold tracking-wide">${meta.label}</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800/80 text-slate-500 font-medium">${sub.payment || 'Credit Card'}</span>
                                 </div>
+                                ${sub.notes ? `<p class="text-xs text-slate-400 font-medium italic mt-0.5 truncate max-w-xs md:max-w-md">"${sub.notes}"</p>` : ''}
                                 <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
                                     <i data-lucide="calendar" class="w-3 h-3"></i> Renewal: ${sub.date}
                                 </p>
@@ -866,9 +1043,21 @@
                             <div class="text-left sm:text-right">
                                 <p class="text-base font-black text-slate-200">${currencySymbol}${convertedCost.toFixed(2)}</p>
                                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mt-0.5">${sub.cycle}</p>
+                                ${sub.startDate && lifetimeVal > 0 ? `<p class="text-[9px] font-bold text-indigo-400/70 mt-1" title="Lifetime Spend">LTV: ${currencySymbol}${lifetimeVal.toFixed(2)}</p>` : ''}
                             </div>
                             <div class="flex items-center gap-2">
                                 ${timelineBadge}
+                                ${!isPaused ? `
+                                <button onclick="window.markAsPaid(${sub.originalIndex})" class="p-2 bg-slate-950 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-900/50 text-slate-500 hover:text-emerald-400 rounded-xl transition-all active:scale-90" title="Mark Paid & Advance Date">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                </button>
+                                ` : ''}
+                                <button onclick="window.toggleSubscriptionStatus(${sub.originalIndex})" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 ${isPaused ? 'text-emerald-400' : 'text-purple-400'} rounded-xl transition-all active:scale-90" title="${isPaused ? 'Activate Component' : 'Pause Component'}">
+                                    <i data-lucide="${isPaused ? 'play' : 'pause'}" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="window.duplicateSubscription(${sub.originalIndex})" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-500 hover:text-amber-400 rounded-xl transition-all active:scale-90" title="Clone Element">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>
                                 <button onclick="window.editSubscription(${sub.originalIndex})" class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-500 hover:text-indigo-400 rounded-xl transition-all active:scale-90" title="Edit Element">
                                     <i data-lucide="edit-2" class="w-4 h-4"></i>
                                 </button>
@@ -893,6 +1082,11 @@
                 cycle: document.getElementById('sub-cycle').value,
                 category: document.getElementById('sub-category').value,
                 date: document.getElementById('sub-date').value,
+                startDate: document.getElementById('sub-start-date').value,
+                url: document.getElementById('sub-url').value.trim(),
+                payment: document.getElementById('sub-payment').value,
+                status: document.getElementById('sub-status').value,
+                notes: document.getElementById('sub-notes').value.trim(),
                 currency: currencySymbol 
             };
 
@@ -908,6 +1102,9 @@
             window.saveData();
             form.reset();
             document.getElementById('sub-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('sub-start-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('sub-payment').value = 'Credit Card';
+            document.getElementById('sub-status').value = 'active';
         });
 
         window.deleteSubscription = function(index) {
